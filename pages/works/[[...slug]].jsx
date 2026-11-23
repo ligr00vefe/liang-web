@@ -1,16 +1,14 @@
 import fs from 'node:fs';
 import Head from 'next/head';
-import {db,cases} from '../../lib/store';
+import {readGallery} from '../../lib/gallery';
 
 export async function getServerSideProps({params}){
- const conn=db();
- try{
-  const items=cases(conn);
+  const items=await readGallery();
   const id=params.slug?.[0]||null;
   if((params.slug||[]).length>1||id&&!items.some(c=>c.id===id))return {notFound:true};
   const source=fs.readFileSync('content/works.html','utf8');
   return {props:{items:id?items.filter(c=>c.id===id):items,id,header:source.match(/<header.*?<\/header>/s)[0],footer:source.match(/<section class="cta".*$/s)[0]}};
- }finally{conn.close()}
+
 }
 function Photo({item,src,styleName=''}){
  return <figure className={'photo '+styleName}><img src={src} alt={item.short}/>{item.ai&&<figcaption>가상 사례 · AI 생성 이미지 / 실제 시공 사진 아님</figcaption>}</figure>;

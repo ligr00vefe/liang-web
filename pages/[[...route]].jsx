@@ -17,7 +17,7 @@ export async function getServerSideProps({params}) {
   if (!Object.hasOwn(pages,route)) return {notFound:true};
   const [name,title]=pages[route];
   const markup=fs.readFileSync(path.join(process.cwd(),'content',name+'.html'),'utf8');
-  return {props:{name,title,markup:name === 'main' ? homeGallery(markup) : markup}};
+  return {props:{name,title,markup:name === 'main' ? await homeGallery(markup) : markup}};
 }
 export default function PublicPage({name,title,markup}) {
   return <><Head><title>{title} | 리앙 가구</title><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href={name==='main'?'/main.css':'/sub.css'}/></Head>
