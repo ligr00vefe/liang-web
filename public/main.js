@@ -1,0 +1,14 @@
+
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const intro=document.querySelector('.about-statement');intro.innerHTML=intro.textContent.split(' ').map(w=>'<span class="word">'+w+'</span>').join(' ');
+const observer=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');observer.unobserve(e.target);}}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));
+const floating=document.querySelector('.floating-nav'),words=[...intro.querySelectorAll('.word')],cta=document.querySelector('.cta'),ctaBg=document.querySelector('.cta-bg');let ticking=false;
+function scrollFrame(){const y=scrollY,show=y>innerHeight*.75;floating.classList.toggle('show',show);floating.setAttribute('aria-hidden',String(!show));floating.querySelectorAll('a,button').forEach(e=>e.tabIndex=show?0:-1);const r=intro.getBoundingClientRect();const p=Math.max(0,Math.min(1,(innerHeight*.9-r.top)/(innerHeight*.55)));words.forEach((w,i)=>w.style.opacity=reduce||p>(i/words.length)?'1':'.2');if(!reduce){const cr=cta.getBoundingClientRect();ctaBg.style.transform='translateY('+Math.max(-45,Math.min(45,(cr.top-innerHeight*.3)*.08))+'px)';}ticking=false;}
+addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(scrollFrame)}},{passive:true});addEventListener('resize',scrollFrame);scrollFrame();
+const menu=document.querySelector('#menu-panel'),menuButtons=[...document.querySelectorAll('.menu-toggle')];let previousFocus;
+function openMenu(){previousFocus=document.activeElement;menu.classList.add('open');menuButtons.forEach(b=>b.setAttribute('aria-expanded','true'));document.body.style.overflow='hidden';menu.querySelector('.menu-close').focus();}
+function closeMenu(){menu.classList.remove('open');menuButtons.forEach(b=>b.setAttribute('aria-expanded','false'));document.body.style.overflow='';if(previousFocus)previousFocus.focus();}
+menuButtons.forEach(b=>b.addEventListener('click',openMenu));menu.querySelector('.menu-close').addEventListener('click',closeMenu);menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+addEventListener('keydown',e=>{if(!menu.classList.contains('open'))return;if(e.key==='Escape')closeMenu();if(e.key==='Tab'){const f=[...menu.querySelectorAll('a,button')],first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+document.querySelectorAll('[data-inquiry]').forEach(b=>b.onclick=()=>location.assign('/inquiry'));
+document.querySelectorAll('.faq-list details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)document.querySelectorAll('.faq-list details').forEach(other=>{if(other!==d)other.open=false})}));
