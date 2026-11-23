@@ -3,7 +3,10 @@ import {useState} from 'react';
 import {db,cases,signedIn,setupToken} from '../../lib/store';
 
 export async function getServerSideProps({req,query}){
- if(process.env.NODE_ENV!=='development')return {notFound:true};
+ if(process.env.NODE_ENV!=='development'){
+  if ((query.panel || []).length) return {notFound:true};
+  return {props:{mode:'login', ready:false, items:[], id:'', token:'', loginAvailable:false}};
+ }
  const conn=db();
  try{
   const ready=Boolean(conn.prepare('SELECT id FROM owner').get());
@@ -16,7 +19,7 @@ export async function getServerSideProps({req,query}){
  }finally{conn.close()}
 }
 const blank={short:'',category:'카페',products:'',desc:'',material:'',finish:'',condition:'',photos:[],ai:true};
-export default function Admin({mode,ready,items,id,token}){
+export default function Admin({mode,ready,items,id,token,loginAvailable=true}){
  const [item,setItem]=useState(items.find(x=>x.id===id)||blank);
  const [status,setStatus]=useState('');
  const [busy,setBusy]=useState(false);
@@ -37,10 +40,10 @@ export default function Admin({mode,ready,items,id,token}){
  const auth=mode==='login'||mode==='setup';
  return <><Head><title>리앙 가구 관리자</title><meta name="robots" content="noindex"/><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/></Head><header className="admin-header"><a className="logo" href="/"><img src="/assets/logo_liang_dark.svg" alt="리앙 가구"/></a><span>관리자</span><a href="/works">공개 갤러리 보기</a></header>
  <main className="shell section" style={{maxWidth:auth?460:1000}}>
- {auth?<><h1>{mode==='setup'?'첫 관리자 계정 설정':'관리자 로그인'}</h1><form onSubmit={e=>{e.preventDefault();const data=new FormData(e.currentTarget);if(mode==='setup'&&data.get('password')!==data.get('confirm')){setStatus('비밀번호가 일치하지 않습니다.');return}send({action:mode,token,email:data.get('email'),password:data.get('password')})}}>
- <label>대표 이메일<input type="email" name="email" required/></label><label>비밀번호<input type="password" name="password" autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
+ {auth?<><h1>{mode==='setup'?'첫 관리자 계정 설정':'관리자 로그인'}</h1><form onSubmit={e=>{e.preventDefault();if(!loginAvailable)return;const data=new FormData(e.currentTarget);if(mode==='setup'&&data.get('password')!==data.get('confirm')){setStatus('비밀번호가 일치하지 않습니다.');return}send({action:mode,token,email:data.get('email'),password:data.get('password')})}}>
+ <label>대표 이메일<input type="email" name="email" disabled={!loginAvailable} required/></label><label>비밀번호<input type="password" name="password" disabled={!loginAvailable} autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
  {mode==='setup'&&<label>비밀번호 확인<input type="password" name="confirm" required minLength="12"/></label>}
- <button className="button submit" disabled={busy}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
+ <button className="button submit" disabled={busy||!loginAvailable}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!loginAvailable&&<p role="status">운영 관리자 계정을 준비 중입니다.</p>}{loginAvailable&&!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
  mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><a className="button" href="/admin/editor">새 사례 등록</a></div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}<button className="text-link" onClick={()=>send({action:'logout'})}>로그아웃</button></>:
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
