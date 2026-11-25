@@ -1,8 +1,9 @@
 import crypto from 'node:crypto';
 import {db,signedIn,digest,setupToken} from '../../lib/store';
+import {productionAuth} from '../../lib/production-admin';
 export const config={api:{bodyParser:{sizeLimit:'72mb'}}};
 export default function handler(req,res){
-  if(process.env.NODE_ENV!=='development')return res.status(503).end();
+  if(process.env.NODE_ENV!=='development')return productionAuth(req,res);
   if(req.method!=='POST'||req.headers.origin!=='http://'+req.headers.host)return res.status(403).end();
   const conn=db();
   try{

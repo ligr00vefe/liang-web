@@ -2,10 +2,16 @@ import Head from 'next/head';
 import {useState} from 'react';
 import {db,cases,signedIn,setupToken} from '../../lib/store';
 
-export async function getServerSideProps({req,query,params}){
+import {adminConfigured,productionSignedIn} from '../../lib/production-admin';
+import {readGallery} from '../../lib/gallery';
+
+export async function getServerSideProps({req,res,query,params}){
+ res.setHeader('Cache-Control','private, no-store');
  if(process.env.NODE_ENV!=='development'){
   if (params?.panel?.length) return {notFound:true};
-  return {props:{mode:'login', ready:false, items:[], id:'', token:'', loginAvailable:false}};
+  const loginAvailable=adminConfigured();
+  const signedIn=await productionSignedIn(req);
+  return {props:{mode:signedIn?'list':'login', ready:loginAvailable, items:signedIn?await readGallery():[], id:'', token:'', loginAvailable, production:true}};
  }
  const conn=db();
  try{
@@ -19,7 +25,7 @@ export async function getServerSideProps({req,query,params}){
  }finally{conn.close()}
 }
 const blank={short:'',category:'카페',products:'',desc:'',material:'',finish:'',condition:'',photos:[],ai:true};
-export default function Admin({mode,ready,items,id,token,loginAvailable=true}){
+export default function Admin({mode,ready,items,id,token,loginAvailable=true,production=false}){
  const [item,setItem]=useState(items.find(x=>x.id===id)||blank);
  const [status,setStatus]=useState('');
  const [busy,setBusy]=useState(false);
@@ -44,7 +50,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true}){
  <label>대표 이메일<input type="email" name="email" disabled={!loginAvailable} required/></label><label>비밀번호<input type="password" name="password" disabled={!loginAvailable} autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
  {mode==='setup'&&<label>비밀번호 확인<input type="password" name="confirm" required minLength="12"/></label>}
  <button className="button submit" disabled={busy||!loginAvailable}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!loginAvailable&&<p role="status">운영 관리자 계정을 준비 중입니다.</p>}{loginAvailable&&!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
- mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><a className="button" href="/admin/editor">새 사례 등록</a></div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}<button className="text-link" onClick={()=>send({action:'logout'})}>로그아웃</button></>:
+ mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1>{!production&&<a className="button" href="/admin/editor">새 사례 등록</a>}</div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span>{!production&&<><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></>}</article>)}<button className="text-link" onClick={()=>send({action:'logout'})}>로그아웃</button></>:
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
  {Object.entries({short:'제목',products:'제작 품목',desc:'본문',material:'소재',finish:'마감',condition:'현장 조건'}).map(([key,label])=><label key={key}>{label}<textarea rows={key==='desc'?4:1} value={item[key]||''} required={['short','products','desc'].includes(key)} onChange={e=>field(key,e.target.value)}/></label>)}</section>
