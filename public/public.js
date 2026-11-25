@@ -12,8 +12,10 @@ document.querySelector('.inquiry-form')?.addEventListener('submit', async event 
   button.disabled = true;
   const local = ['localhost','127.0.0.1'].includes(location.hostname);
   try {
-    const response = await fetch(local ? '/api/inquiry' : '/forms.html', {
-      method:'POST', body:new URLSearchParams(new FormData(form))
+    const response = await fetch(local ? '/api/inquiry' : form.action, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(new FormData(form))
     });
     if (!response.ok) throw Error();
     form.reset();
