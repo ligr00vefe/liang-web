@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import InquiryManager from '../../components/InquiryManager';
 import {useState} from 'react';
 import {db,cases,signedIn,setupToken} from '../../lib/store';
 
@@ -78,7 +79,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  <label>대표 이메일<input type="email" name="email" required/></label><label>비밀번호<input type="password" name="password" autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
  {mode==='setup'&&<label>비밀번호 확인<input type="password" name="confirm" required minLength="12"/></label>}
  <button className="button submit" disabled={busy}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!loginAvailable&&<p role="status">처음 접속하나요? 전달받은 초기 설정 링크에서 비밀번호를 정해 주세요.</p>}{loginAvailable&&!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
- mode==='inquiries'?<><div className="admin-title"><div><h1>제작 문의 관리</h1><p className="muted">홈페이지로 접수된 제작 문의를 확인합니다.</p></div></div><section className="inquiry-management"><h2>접수된 문의 확인</h2><p>Netlify 문의함에서 성함, 연락처, 설치 지역과 문의 내용을 확인하고 삭제할 수 있습니다.</p><a className="button" href="https://app.netlify.com/projects/liangfurniture/forms" target="_blank" rel="noopener noreferrer">Netlify 문의함 열기<span className="external-note">새 창</span></a><p className="inquiry-access">프로젝트에 접근할 수 있는 Netlify 계정으로 로그인해 주세요.</p></section></>:
+ mode==='inquiries'?<InquiryManager/>:
  mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><a className="button" href="/admin/editor">새 사례 등록</a></div><div className="management-head"><span>시공사례</span><span>공간</span><span>수정</span><span>삭제</span></div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}</>:
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor compact-editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
