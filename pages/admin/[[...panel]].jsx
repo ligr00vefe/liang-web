@@ -80,6 +80,27 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor compact-editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
  {Object.entries({short:'제목',products:'제작 품목',desc:'본문',material:'소재',finish:'마감',condition:'현장 조건'}).map(([key,label])=><label key={key} className={key==='desc'?'field-wide':''}>{label}{key==='desc'?<textarea rows={3} maxLength={3000} value={item[key]||''} required onChange={e=>field(key,e.target.value)}/>:<input maxLength={{short:100,products:250,material:250,finish:250,condition:500}[key]} value={item[key]||''} required={['short','products'].includes(key)} onChange={e=>field(key,e.target.value)}/>}</label>)}</section>
- <section className="editor-panel"><h2>사진</h2><label className="photo-drop"><strong>사진 선택</strong><span>JPG · PNG · WebP / 최대 10장 · 장당 5MB</span><input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={e=>upload([...e.target.files])}/></label><div className="photo-list">{item.photos.map((src,i)=><div className="photo-item" key={i}><img src={src} alt={'사진 '+(i+1)}/><button type="button" onClick={()=>field('photos',[src,...item.photos.filter((_,n)=>n!==i)])}>{i===0?'대표 사진':'대표로 지정'}</button><button type="button" onClick={()=>field('photos',item.photos.filter((_,n)=>n!==i))}>삭제</button></div>)}</div><label><input type="checkbox" checked={item.ai} onChange={e=>field('ai',e.target.checked)}/> AI 생성 가상 사례</label></section><div className="editor-actions"><a href="/admin" className="button outline">취소</a><button disabled={busy} className="button">저장</button></div></form></>}
+ <section className="editor-panel photo-panel">
+ <div className="photo-panel-heading"><h2>사진</h2><span>{item.photos.length}/10장</span></div>
+ <p className="photo-help">JPG · PNG · WebP / 장당 5MB 이하</p>
+ <div className={'photo-picker '+(item.photos.length?'has-photos':'')}>
+  {item.photos.map((src,i)=><div className={'photo-tile '+(i===0?'cover-photo':'')} key={i}>
+   <img src={src} alt={'선택한 사진 '+(i+1)}/>
+   {i===0&&<span className="cover-label">대표 사진</span>}
+   <div className="photo-tile-actions">
+    {i>0&&<button type="button" onClick={()=>field('photos',[src,...item.photos.filter((_,n)=>n!==i)])}>대표로 지정</button>}
+    <button type="button" aria-label={(i+1)+'번째 사진 삭제'} onClick={()=>field('photos',item.photos.filter((_,n)=>n!==i))}>삭제</button>
+   </div>
+  </div>)}
+  {item.photos.length<10&&<label className="photo-add">
+   <span className="photo-add-icon" aria-hidden="true">+</span>
+   <strong>{item.photos.length?'사진 추가':'사진 선택'}</strong>
+   {!item.photos.length&&<span>최대 10장까지 등록할 수 있어요</span>}
+   <input type="file" aria-label="사진 선택" accept="image/png,image/jpeg,image/webp" multiple onChange={e=>{upload([...e.target.files]);e.target.value='';}}/>
+  </label>}
+ </div>
+ <div className="ai-setting"><label className="checkbox"><input type="checkbox" checked={item.ai} onChange={e=>field('ai',e.target.checked)}/><span>AI 이미지 표시</span></label>
+ <p>체크하면 공개 사진에 ‘가상 사례 · AI 생성 이미지’ 안내가 표시됩니다.</p></div>
+</section><div className="editor-actions"><a href="/admin" className="button outline">취소</a><button disabled={busy} className="button">저장</button></div></form></>}
  <p role="status">{status}</p></main></>;
 }
