@@ -1,0 +1,29 @@
+.admin-workspace{padding-block:28px 32px}
+.admin-workspace>h1{font-size:32px;margin-bottom:22px}
+.admin-workspace .admin-title{margin-bottom:24px}
+.management-head,.admin-workspace .admin-case{display:grid;grid-template-columns:minmax(240px,1fr) 100px 70px 70px;gap:24px}
+.management-head{padding:13px 18px;background:var(--secondary);font-size:14px;border-block:1px solid var(--line)}
+.admin-workspace .admin-case{padding:18px;border-bottom:1px solid var(--line)}
+.admin-workspace .case-meta img{width:90px;height:68px}
+.admin-workspace .admin-case>a,.admin-workspace .admin-case>button{padding:8px 0;font-size:14px;text-align:center}
+.admin-bottom{display:flex;justify-content:flex-end;margin-top:28px}
+.admin-bottom .button{min-height:42px;padding:8px 22px}
+.admin-workspace .compact-editor{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;max-width:none}
+.compact-editor .editor-panel{margin:0;padding:22px;min-width:0}
+.compact-editor .editor-panel:first-child{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;align-content:start}
+.compact-editor .editor-panel>label{margin:0}
+.compact-editor .field-wide{grid-column:1/-1}
+.compact-editor input:not([type]),.compact-editor select,.compact-editor textarea{padding:8px 11px;margin-top:5px;font-size:14px}
+.compact-editor textarea{resize:none;height:90px}
+.compact-editor h2{font-size:22px;margin-bottom:14px}
+.compact-editor .editor-actions{grid-column:1/-1;margin-top:0}
+.photo-drop{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:125px;border:1px dashed var(--muted);background:var(--paper);cursor:pointer;padding:20px;text-align:center;position:relative}
+.photo-drop strong{font-size:16px;font-weight:500}
+.photo-drop>span{font-size:12px!important;margin:6px 0 0!important}
+.photo-drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.photo-drop:focus-within{outline:2px solid var(--primary)}
+.compact-editor .photo-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;max-height:240px;overflow-y:auto}
+.compact-editor .photo-item{width:auto;min-width:0}
+.compact-editor .photo-item img{height:80px;width:100%;object-fit:cover}
+.compact-editor .photo-item button{font-size:12px;padding:6px 3px}
+@media(max-width:760px){.admin-workspace .compact-editor{grid-template-columns:1fr}.management-head{display:none}.admin-workspace .admin-case{grid-template-columns:1fr 1fr;gap:12px}.admin-workspace .case-meta{grid-column:1/-1}.admin-workspace .admin-case>a,.admin-workspace .admin-case>button{text-align:left}.compact-editor .editor-panel{padding:18px}.admin-workspace>h1{font-size:28px}}
