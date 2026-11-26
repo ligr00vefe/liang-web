@@ -9,12 +9,12 @@ export async function getServerSideProps({req,res,query,params}){
  res.setHeader('Cache-Control','private, no-store');
  if(process.env.NODE_ENV!=='development'){
   const requested=(params?.panel ?? []).join('/');
-  if (!['','editor','setup'].includes(requested)) return {notFound:true};
+  if (!['','editor','setup','inquiries'].includes(requested)) return {notFound:true};
   const state=await adminState();
   const auth=await productionSignedIn(req);
-  if(requested==='editor'&&!auth) return {redirect:{destination:'/admin',permanent:false}};
+  if(['editor','inquiries'].includes(requested)&&!auth) return {redirect:{destination:'/admin',permanent:false}};
   if(requested==='setup'&&(!state.invite||state.ready)) return {notFound:true};
-  const mode=requested==='setup'?'setup':auth?(requested==='editor'?'editor':'list'):'login';
+  const mode=requested==='setup'?'setup':auth?(requested==='editor'?'editor':requested==='inquiries'?'inquiries':'list'):'login';
   return {props:{mode,ready:state.ready,items:auth?await readGallery():[],id:auth&&typeof query.id==='string'?query.id:'',token:'',loginAvailable:state.ready||mode==='setup',production:true}};
  }
   const conn=db();
@@ -24,7 +24,7 @@ export async function getServerSideProps({req,res,query,params}){
   const requested=(params?.panel ?? []).join('/');
   const setup=!ready&&requested==='setup'&&query.token===setupToken();
   if(!ready)setupToken();
-  const mode=auth?(requested==='editor'?'editor':'list'):setup?'setup':'login';
+  const mode=auth?(requested==='editor'?'editor':requested==='inquiries'?'inquiries':'list'):setup?'setup':'login';
   return {props:{mode,ready,items:auth?cases(conn):[],id:auth?query.id||'':'',token:setup?query.token:''}};
  }finally{conn.close()}
 }
@@ -71,12 +71,15 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  }
  const auth=mode==='login'||mode==='setup';
  return <><Head><title>리앙 가구 관리자</title><meta name="robots" content="noindex"/><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/><link rel="stylesheet" href="/admin.css"/></Head><header className="admin-header"><a className="logo" href="/"><img src="/assets/logo_liang_dark.svg" alt="리앙 가구"/></a><span>관리자</span><a href="/works">공개 갤러리 보기</a></header>
+ <div className={auth?'':'admin-console'}>
+ {!auth&&<aside className="console-sidebar"><div><p className="eyebrow">리앙 가구 관리</p><nav aria-label="관리자 메뉴"><a href="/admin" aria-current={mode!=='inquiries'?'page':undefined}>시공사례 관리</a><a href="/admin/inquiries" aria-current={mode==='inquiries'?'page':undefined}>제작 문의 관리</a></nav></div><div className="console-account"><p>대표 관리자</p><button className="button outline" disabled={busy} onClick={()=>send({action:'logout'})}>로그아웃</button></div></aside>}
  <main className={auth?"shell section":"shell admin-workspace"} style={{maxWidth:auth?460:1200}}>
  {auth?<><h1>{mode==='setup'?'첫 관리자 계정 설정':'관리자 로그인'}</h1><form onSubmit={e=>{e.preventDefault();if(!loginAvailable){setStatus('받은 초기 설정 링크에서 관리자 비밀번호를 먼저 설정해 주세요.');return;}const data=new FormData(e.currentTarget);if(mode==='setup'&&data.get('password')!==data.get('confirm')){setStatus('비밀번호가 일치하지 않습니다.');return}send({action:mode,token:production&&mode==='setup'?location.hash.slice(1):token,email:data.get('email'),password:data.get('password')})}}>
  <label>대표 이메일<input type="email" name="email" required/></label><label>비밀번호<input type="password" name="password" autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
  {mode==='setup'&&<label>비밀번호 확인<input type="password" name="confirm" required minLength="12"/></label>}
  <button className="button submit" disabled={busy}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!loginAvailable&&<p role="status">처음 접속하나요? 전달받은 초기 설정 링크에서 비밀번호를 정해 주세요.</p>}{loginAvailable&&!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
- mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><a className="button" href="/admin/editor">새 사례 등록</a></div><div className="management-head"><span>시공사례</span><span>공간</span><span>수정</span><span>삭제</span></div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}<div className="admin-bottom"><button className="button outline" onClick={()=>send({action:'logout'})}>로그아웃</button></div></>:
+ mode==='inquiries'?<><div className="admin-title"><div><h1>제작 문의 관리</h1><p className="muted">홈페이지로 접수된 제작 문의를 확인합니다.</p></div></div><section className="inquiry-management"><h2>접수된 문의 확인</h2><p>Netlify 문의함에서 성함, 연락처, 설치 지역과 문의 내용을 확인하고 삭제할 수 있습니다.</p><a className="button" href="https://app.netlify.com/projects/liangfurniture/forms" target="_blank" rel="noopener noreferrer">Netlify 문의함 열기<span className="external-note">새 창</span></a><p className="inquiry-access">프로젝트에 접근할 수 있는 Netlify 계정으로 로그인해 주세요.</p></section></>:
+ mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><a className="button" href="/admin/editor">새 사례 등록</a></div><div className="management-head"><span>시공사례</span><span>공간</span><span>수정</span><span>삭제</span></div>{items.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}</>:
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor compact-editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
  {Object.entries({short:'제목',products:'제작 품목',desc:'본문',material:'소재',finish:'마감',condition:'현장 조건'}).map(([key,label])=><label key={key} className={key==='desc'?'field-wide':''}>{label}{key==='desc'?<textarea rows={3} maxLength={3000} value={item[key]||''} required onChange={e=>field(key,e.target.value)}/>:<input maxLength={{short:100,products:250,material:250,finish:250,condition:500}[key]} value={item[key]||''} required={['short','products'].includes(key)} onChange={e=>field(key,e.target.value)}/>}</label>)}</section>
@@ -102,5 +105,5 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  <div className="ai-setting"><label className="checkbox"><input type="checkbox" checked={item.ai} onChange={e=>field('ai',e.target.checked)}/><span>AI 이미지 표시</span></label>
  <p>체크하면 공개 사진에 ‘가상 사례 · AI 생성 이미지’ 안내가 표시됩니다.</p></div>
 </section><div className="editor-actions"><a href="/admin" className="button outline">취소</a><button disabled={busy} className="button">저장</button></div></form></>}
- <p role="status">{status}</p></main></>;
+ <p role="status">{status}</p></main></div></>;
 }
