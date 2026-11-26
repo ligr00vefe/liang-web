@@ -53,7 +53,12 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
   setBusy(true);
   try{
    const response=await fetch('/api/manage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-   if(!response.ok)throw Error();
+   if(!response.ok){
+    const details=await response.json().catch(()=>null);
+    setStatus(details?.error || '처리할 수 없습니다. 입력 내용과 로그인 상태를 확인해 주세요.');
+    setBusy(false);
+    return;
+   }
    location.assign('/admin');
   }catch{setStatus('처리할 수 없습니다. 입력 내용과 로그인 상태를 확인해 주세요.');setBusy(false)}
  }
