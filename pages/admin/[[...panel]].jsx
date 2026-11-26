@@ -83,7 +83,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  <section className="editor-panel photo-panel">
  <div className="photo-panel-heading"><h2>사진</h2><span>{item.photos.length}/10장</span></div>
  <p className="photo-help">JPG · PNG · WebP / 장당 5MB 이하</p>
- <div className={'photo-picker '+(item.photos.length?'has-photos':'')}>
+ <div className={'photo-picker '+(item.photos.length?'has-photos':'')+(item.photos.length>2?' many-photos':'')+(item.photos.length>5?' dense-photos':'')}>
   {item.photos.map((src,i)=><div className={'photo-tile '+(i===0?'cover-photo':'')} key={i}>
    <img src={src} alt={'선택한 사진 '+(i+1)}/>
    {i===0&&<span className="cover-label">대표 사진</span>}
