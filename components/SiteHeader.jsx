@@ -16,7 +16,7 @@ export default function SiteHeader(){
  },[]);
  return <header className="site-header">
   <div className="site-header-inner">
-   <Link href="/" className="site-brand" aria-label="리앙 가구 홈"><img src="/assets/logo_liang_dark.svg" alt="리앙 가구"/></Link>
+   <Link href="/" className="site-brand" aria-label="리앙 가구 홈"><img src="/assets/logo_liang_header.svg" alt="리앙 가구"/></Link>
    <nav className="site-desktop-nav" aria-label="주 메뉴">{links.map(([href,label])=><Link key={href} href={href} aria-current={router.asPath.startsWith(href)?'page':undefined}>{label}</Link>)}</nav>
    <button ref={toggle} type="button" className="site-menu-toggle" aria-label={open?'메뉴 닫기':'메뉴 열기'} aria-expanded={open} aria-controls="site-mobile-menu" onClick={()=>setOpen(value=>!value)}>{open?'닫기':'메뉴'}<span aria-hidden="true">{open?'×':'☰'}</span></button>
   </div>

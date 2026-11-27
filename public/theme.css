@@ -1,6 +1,6 @@
 :root {
-  --header-logo-width: 144px;
-  --header-logo-height: 64px;
+  --header-logo-width: 86px;
+  --header-logo-height: 72px;
   --content-max-width: 1440px;
   --content-gutter: 72px;
   --content-width: min(calc(100% - 2 * var(--content-gutter)), var(--content-max-width));
@@ -104,8 +104,8 @@ h1,h2,h3 {color:var(--heading)}
 @media(max-width:760px) {
   :root {
     --content-gutter:20px;
-    --header-logo-width:120px;
-    --header-logo-height:56px;
+    --header-logo-width:72px;
+    --header-logo-height:60px;
     --brand-footer-size:14.4vw;
   }
 }
