@@ -28,3 +28,5 @@
 .privacy-details>div{padding:0 0 16px}.privacy-details h3:not(:first-child){margin-top:18px}
 .privacy-details .privacy-summary{margin-top:10px;font-size:13px;border-top:1px solid var(--line)}
 @media(max-width:480px){.privacy-summary{font-size:13px}.privacy-summary th{width:96px}.privacy-summary th,.privacy-summary td{padding:13px 10px}.privacy-summary td strong{font-size:16px}}
+.privacy-dialog{word-break:keep-all}
+.privacy-summary caption.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
