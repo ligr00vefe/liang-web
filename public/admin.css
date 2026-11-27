@@ -115,3 +115,8 @@ button:disabled{cursor:default;opacity:.5}
 .inquiry-delete>p{font-size:13px;color:var(--primary);margin-top:10px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:760px){.inquiry-table-head{display:none}.inquiry-row{grid-template-columns:1fr 1fr;gap:10px;padding:18px}.inquiry-row time,.inquiry-excerpt{grid-column:1/-1}.inquiry-row .inquiry-detail-button{grid-column:1/-1}.inquiry-fields>div{grid-template-columns:75px minmax(0,1fr);gap:12px}.inquiry-dialog{padding:20px}.inquiry-detail-heading h2{font-size:22px}}
+
+.inquiry-folders{display:flex;gap:8px;margin:0 0 20px}
+.inquiry-folders button{min-height:42px;padding:8px 20px;border:1px solid var(--line);font-size:14px}
+.inquiry-folders button[aria-pressed=true]{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+.inquiry-folder-note{font-size:13px;color:var(--muted);margin-bottom:20px}

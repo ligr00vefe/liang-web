@@ -56,9 +56,11 @@ export default async function inquiries(req,res) {
       }
       return res.json({submission:publicSubmission(row)});
     }
+    const state=req.query.state ?? 'verified';
+    if(!['verified','spam'].includes(state)) return res.status(400).end();
     const page=Number(req.query.page ?? 1);
     if(!Number.isInteger(page)||page<1||page>10000) return res.status(400).end();
-    const rows=await netlify('/forms/'+formId+'/submissions?page='+page+'&per_page='+pageSize);
+    const rows=await netlify('/forms/'+formId+'/submissions?page='+page+'&per_page='+pageSize+(state==='spam'?'&state=spam':''));
     return res.json({submissions:rows.map(publicSubmission),page,hasNext:rows.length===pageSize});
   } catch(error) {
     if(error.status===404) return res.status(404).json({error:'문의를 찾을 수 없습니다.'});

@@ -4,6 +4,7 @@ const date=value=>new Date(value).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',
 const labels={name:'성함',phone:'연락처',area:'설치 지역',schedule:'희망 일정',size:'대략적인 크기',message:'문의 내용'};
 export default function InquiryManager() {
   const [rows,setRows]=useState([]);
+  const [state,setState]=useState('verified');
   const [page,setPage]=useState(1);
   const [next,setNext]=useState(false);
   const [refresh,setRefresh]=useState(0);
@@ -17,7 +18,7 @@ export default function InquiryManager() {
   useEffect(()=>{
     const controller=new AbortController();
     setLoading(true);setError('');
-    fetch('/api/inquiries?page='+page,{signal:controller.signal,cache:'no-store'})
+    fetch('/api/inquiries?state='+state+'&page='+page,{signal:controller.signal,cache:'no-store'})
       .then(async response=>{
         const body=await response.json();
         if(!response.ok) throw new Error(body.error || '문의함을 불러오지 못했습니다.');
@@ -26,7 +27,7 @@ export default function InquiryManager() {
       }).catch(error=>{if(error.name!=='AbortError')setError(error.message);})
       .finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return ()=>controller.abort();
-  },[page,refresh]);
+  },[page,refresh,state]);
   useEffect(()=>{
     if(selected&&!dialog.current.open) dialog.current.showModal();
   },[selected]);
@@ -48,12 +49,17 @@ export default function InquiryManager() {
   return <>
     <div className="admin-title"><div><h1>제작 문의 관리</h1><p className="muted">홈페이지에서 접수된 제작 문의를 확인하고 관리합니다.</p></div>
       <button className="button outline" disabled={loading} onClick={()=>{setNotice('');setRefresh(value=>value+1);}}>새로고침</button></div>
+    <div className="inquiry-folders" role="group" aria-label="문의함 선택">
+      <button type="button" aria-pressed={state==='verified'} onClick={()=>{setState('verified');setPage(1);}}>접수함</button>
+      <button type="button" aria-pressed={state==='spam'} onClick={()=>{setState('spam');setPage(1);}}>스팸함</button>
+    </div>
+    {state==='spam'&&<p className="inquiry-folder-note">자동으로 스팸 분류된 문의입니다. 실제 고객의 문의가 포함돼 있는지 확인해 주세요.</p>}
     <p className="inquiry-notice" role="status">{notice}</p>
     <section className="inquiry-table" aria-label="제작 문의 목록" aria-busy={loading}>
       <div className="inquiry-table-head"><span>접수일</span><span>성함</span><span>설치 지역</span><span>문의 내용</span><span>관리</span></div>
       {loading?<div className="inquiry-empty" role="status">문의를 불러오는 중입니다.</div>:
        error?<div className="inquiry-empty" role="alert"><p>{error}</p><button className="button outline" onClick={()=>setRefresh(value=>value+1)}>다시 불러오기</button></div>:
-       rows.length===0?<div className="inquiry-empty">아직 접수된 문의가 없습니다.</div>:
+       rows.length===0?<div className="inquiry-empty">{state==='spam'?'스팸 분류된 문의가 없습니다.':'아직 접수된 문의가 없습니다.'}</div>:
        rows.map(row=><article key={row.id} className="inquiry-row">
         <time dateTime={row.createdAt}>{date(row.createdAt)}</time><strong>{row.data.name||'이름 없음'}</strong><span>{row.data.area||'미입력'}</span>
         <p className="inquiry-excerpt">{row.data.message||'내용 없음'}</p>
