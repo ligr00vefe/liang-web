@@ -16,3 +16,15 @@
 .privacy-dialog-footer{padding:16px 28px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;flex-shrink:0}
 .privacy-dialog-footer .button{padding:10px 28px;background:var(--primary);color:var(--accent);border:0;font:inherit;cursor:pointer}
 @media(max-width:480px){.privacy-dialog-header,.privacy-dialog-content{padding:20px}.privacy-dialog-header h2{font-size:20px}.privacy-dialog-footer{padding:14px 20px}.privacy-dialog-footer .button{width:100%}}
+.privacy-intro{color:var(--muted)}
+.privacy-summary{width:100%;border-collapse:collapse;margin:22px 0 0;table-layout:fixed;font-size:14px;border-top:2px solid var(--primary)}
+.privacy-summary th,.privacy-summary td{padding:15px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.privacy-summary th{width:132px;background:var(--secondary);font-weight:500;color:var(--heading)}
+.privacy-summary td p+p{margin-top:6px}.privacy-summary td strong{font-size:17px}
+.privacy-consent-note{padding:18px 0 0;font-size:13px;color:var(--muted)}
+.privacy-consent-note h3,.privacy-details h3{font-size:14px;line-height:1.6;margin:0 0 6px;color:var(--heading);font-weight:600}
+.privacy-details{margin-top:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:13px}
+.privacy-details summary{cursor:pointer;padding:15px 0;color:var(--heading)}
+.privacy-details>div{padding:0 0 16px}.privacy-details h3:not(:first-child){margin-top:18px}
+.privacy-details .privacy-summary{margin-top:10px;font-size:13px;border-top:1px solid var(--line)}
+@media(max-width:480px){.privacy-summary{font-size:13px}.privacy-summary th{width:96px}.privacy-summary th,.privacy-summary td{padding:13px 10px}.privacy-summary td strong{font-size:16px}}
