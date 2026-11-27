@@ -28,3 +28,8 @@
   }
 }
 .public-main .hero-wordmark {margin-left:0}
+
+.public-sub .inquiry-paused{padding:28px;border:1px solid var(--line);background:var(--secondary);margin-block:24px}
+.public-sub .inquiry-paused h2{font-size:25px;margin-bottom:16px}
+.public-sub .inquiry-paused p{font-size:15px;line-height:1.9;margin-bottom:22px}
+.footer-contact{display:flex;flex-wrap:wrap;gap:20px;margin:24px 0;font-size:14px}

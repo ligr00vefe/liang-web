@@ -2,13 +2,14 @@ import fs from 'node:fs';
 import Head from 'next/head';
 import SiteHeader from '../../components/SiteHeader';
 import {readGallery} from '../../lib/gallery';
+import {prepareContent} from '../../lib/public-content';
 
 export async function getServerSideProps({params}){
   const items=await readGallery();
   const id=params.slug?.[0]||null;
   if((params.slug||[]).length>1||id&&!items.some(c=>c.id===id))return {notFound:true};
   const source=fs.readFileSync('content/works.html','utf8');
-  return {props:{items:id?items.filter(c=>c.id===id):items,id,header:source.match(/<header.*?<\/header>/s)[0],footer:source.match(/<section class="cta".*$/s)[0]}};
+  return {props:{items:id?items.filter(c=>c.id===id):items,id,header:source.match(/<header.*?<\/header>/s)[0],footer:prepareContent(source.match(/<section class="cta".*$/s)[0])}};
 
 }
 function Photo({item,src,styleName=''}){

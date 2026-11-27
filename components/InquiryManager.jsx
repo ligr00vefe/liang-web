@@ -31,6 +31,15 @@ export default function InquiryManager() {
   useEffect(()=>{
     if(selected&&!dialog.current.open) dialog.current.showModal();
   },[selected]);
+  async function updateRetention() {
+    if(!selected||removing)return;
+    setRemoving(true);setDeleteError('');
+    try {
+      const response=await fetch('/api/inquiries?id='+selected.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:selected.retention?'reopen':'close'})});
+      const body=await response.json();if(!response.ok)throw new Error(body.error||'상담 상태를 변경하지 못했습니다.');
+      setSelected({...selected,retention:body.retention});setRefresh(v=>v+1);
+    }catch(error){setDeleteError(error.message);}finally{setRemoving(false);}
+  }
   async function remove() {
     if(!selected||removing) return;
     setRemoving(true);setDeleteError('');
@@ -54,6 +63,7 @@ export default function InquiryManager() {
       <button type="button" aria-pressed={state==='spam'} onClick={()=>{setState('spam');setPage(1);}}>스팸함</button>
     </div>
     {state==='spam'&&<p className="inquiry-folder-note">자동으로 스팸 분류된 문의입니다. 실제 고객의 문의가 포함돼 있는지 확인해 주세요.</p>}
+    <p className="muted">상담 종료 처리한 문의는 종료일로부터 6개월 후 자동 삭제됩니다. 알림 이메일·내보낸 파일은 별도로 삭제해 주세요.</p>
     <p className="inquiry-notice" role="status">{notice}</p>
     <section className="inquiry-table" aria-label="제작 문의 목록" aria-busy={loading}>
       <div className="inquiry-table-head"><span>접수일</span><span>성함</span><span>설치 지역</span><span>문의 내용</span><span>관리</span></div>
@@ -70,6 +80,7 @@ export default function InquiryManager() {
     <dialog className="inquiry-dialog" ref={dialog} onClose={()=>{setSelected(null);setDeleteError('');}} onCancel={event=>{if(removing)event.preventDefault();}}>
       {selected&&<><div className="inquiry-detail-heading"><div><h2>제작 문의 상세</h2><p>{date(selected.createdAt)} 접수</p></div><button type="button" className="button outline" disabled={removing} onClick={()=>dialog.current.close()}>닫기</button></div>
        <dl className="inquiry-fields">{Object.entries(labels).map(([key,label])=><div key={key}><dt>{label}</dt><dd>{selected.data[key]||'미입력'}</dd></div>)}</dl>
+       <section className="inquiry-retention"><p>{selected.retention?'상담 종료: '+date(selected.retention.closed_at)+' / 자동 삭제 예정: '+date(selected.retention.delete_after):'상담 진행 중 — 종료 시 아래 버튼으로 표시해 주세요.'}</p><button className="button outline" disabled={removing} onClick={updateRetention}>{selected.retention?'상담 다시 열기':'상담 종료 처리'}</button><p className="muted">6개월 경과 후 정기 작업에서 문의 원문과 종료 기록을 삭제합니다. 메일함·다운로드 사본은 포함되지 않습니다.</p></section>
        <form onSubmit={event=>{event.preventDefault();remove();}} className="inquiry-delete">
         <label className="checkbox"><input key={selected.id} type="checkbox" required disabled={removing}/><span>이 문의를 영구 삭제하는 데 동의합니다.</span></label>
         <p role="alert">{deleteError}</p><button type="submit" className="button" disabled={removing}>{removing?'삭제 중…':'문의 삭제'}</button>
