@@ -9,15 +9,14 @@ const pages = {
   '': ['main','서울·경기 맞춤가구 제작·설치'],
   about: ['about','리앙 소개'], process: ['process','제작 안내'],
   works: ['works','제작 갤러리'], inquiry: ['inquiry','제작 문의'],
-  privacy: ['privacy','개인정보 안내'],
   'works/cafe': ['work-cafe','맞춤 카운터'],
   'works/store': ['work-store','진열대'],
   'works/office': ['work-office','회의 테이블과 수납장']
 };
 export async function getServerSideProps({params,res}) {
   const route=(params.route || []).join('/');
-  if (!Object.hasOwn(pages,route)) return {notFound:true};
   if(route==='privacy')return {redirect:{destination:'/inquiry?privacy=1',permanent:false}};
+  if (!Object.hasOwn(pages,route)) return {notFound:true};
   const [name,title]=pages[route];
   if(route && !['inquiry','privacy'].includes(route) && !route.startsWith('works'))res.setHeader('Cache-Control','public, s-maxage=3600, stale-while-revalidate=86400');
   const markup=fs.readFileSync(path.join(process.cwd(),'content',name+'.html'),'utf8');
