@@ -1,3 +1,4 @@
+import {ADMIN_PATH} from '../../lib/admin-path';
 import BrandLogo from '../../components/BrandLogo';
 import Head from 'next/head';
 import InquiryManager from '../../components/InquiryManager';
@@ -15,7 +16,7 @@ export async function getServerSideProps({req,res,query,params}){
   if (!['','editor','setup','inquiries','account'].includes(requested)) return {notFound:true};
   const state=await adminState();
   const auth=await productionSignedIn(req);
-  if(['editor','inquiries','account'].includes(requested)&&!auth) return {redirect:{destination:'/admin',permanent:false}};
+  if(['editor','inquiries','account'].includes(requested)&&!auth) return {redirect:{destination:ADMIN_PATH,permanent:false}};
   if(requested==='setup'&&(!state.invite||state.ready)) return {notFound:true};
   const mode=requested==='setup'?'setup':auth?(requested==='editor'?'editor':requested==='inquiries'?'inquiries':requested==='account'?'account':'list'):'login';
   return {props:{mode,ready:state.ready,items:auth?await readGallery():[],id:auth&&typeof query.id==='string'?query.id:'',token:'',loginAvailable:state.ready||mode==='setup',production:true,accountEmail:auth?state.email||'':''}};
@@ -66,7 +67,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
     setBusy(false);
     return;
    }
-   location.assign('/admin');
+   location.assign(ADMIN_PATH);
   }catch{setStatus('처리할 수 없습니다. 입력 내용과 로그인 상태를 확인해 주세요.');setBusy(false)}
  }
  async function upload(files){
@@ -79,7 +80,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  const auth=mode==='login'||mode==='setup';
  return <><Head><title>리앙 가구 관리자</title><meta name="robots" content="noindex"/><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/><link rel="stylesheet" href="/admin.css"/></Head><header className="admin-header"><BrandLogo/><span>관리자</span><a href="/works">공개 갤러리 보기</a></header>
  <div className={auth?'':'admin-console'}>
- {!auth&&<aside className="console-sidebar"><div><p className="eyebrow">리앙 가구 관리</p><nav aria-label="관리자 메뉴"><a href="/admin" aria-current={['list','editor'].includes(mode)?'page':undefined}>시공사례 관리</a><a href="/admin/inquiries" aria-current={mode==='inquiries'?'page':undefined}>제작 문의 관리</a>{production&&<a href="/admin/account" aria-current={mode==='account'?'page':undefined}>계정 설정</a>}</nav></div><div className="console-account"><p>대표 관리자</p><button className="button outline" disabled={busy} onClick={()=>send({action:'logout'})}>로그아웃</button></div></aside>}
+ {!auth&&<aside className="console-sidebar"><div><p className="eyebrow">리앙 가구 관리</p><nav aria-label="관리자 메뉴"><a href={ADMIN_PATH} aria-current={['list','editor'].includes(mode)?'page':undefined}>시공사례 관리</a><a href={ADMIN_PATH+'/inquiries'} aria-current={mode==='inquiries'?'page':undefined}>제작 문의 관리</a>{production&&<a href={ADMIN_PATH+'/account'} aria-current={mode==='account'?'page':undefined}>계정 설정</a>}</nav></div><div className="console-account"><p>대표 관리자</p><button className="button outline" disabled={busy} onClick={()=>send({action:'logout'})}>로그아웃</button></div></aside>}
  <main className={auth?"shell section":"shell admin-workspace"} style={{maxWidth:auth?460:1200}}>
  {auth?<><h1>{mode==='setup'?'첫 관리자 계정 설정':'관리자 로그인'}</h1><form onSubmit={e=>{e.preventDefault();if(!loginAvailable){setStatus('받은 초기 설정 링크에서 관리자 비밀번호를 먼저 설정해 주세요.');return;}const data=new FormData(e.currentTarget);if(mode==='setup'&&data.get('password')!==data.get('confirm')){setStatus('비밀번호가 일치하지 않습니다.');return}send({action:mode,token:production&&mode==='setup'?location.hash.slice(1):token,email:data.get('email'),password:data.get('password')})}}>
  <label>대표 이메일<input type="email" name="email" required/></label><label>비밀번호<input type="password" name="password" autoComplete={mode==='setup'?'new-password':'current-password'} required minLength={mode==='setup'?12:1}/></label>
@@ -87,7 +88,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  <button className="button submit" disabled={busy}>{mode==='setup'?'관리자 계정 생성':'로그인'}</button></form>{!loginAvailable&&<p role="status">처음 접속하나요? 전달받은 초기 설정 링크에서 비밀번호를 정해 주세요.</p>}{loginAvailable&&!ready&&mode==='login'&&<p>최초 계정은 전달받은 초기 설정 링크에서 생성해 주세요.</p>}</>:
  mode==='account'?<AccountSettings email={accountEmail}/>:
  mode==='inquiries'?<InquiryManager/>:
- mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><div className="admin-title-actions">{production&&<a className="button outline" href="/api/gallery-backup">백업 다운로드</a>}<a className="button" href="/admin/editor">새 사례 등록</a></div></div><div className="management-head"><span>시공사례</span><span>공간</span><span>수정</span><span>삭제</span></div>{visibleItems.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={'/admin/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}<nav className="gallery-pagination" aria-label="시공사례 페이지"><span className="gallery-total">총 {items.length}건</span><div><button type="button" className="button outline" disabled={activePage===1} onClick={()=>setListPage(activePage-1)}>이전</button>{Array.from({length:Math.min(5,pageCount)},(_,i)=>Math.min(Math.max(1,activePage-2),Math.max(1,pageCount-4))+i).map(number=><button type="button" key={number} className="page-number" aria-current={number===activePage?'page':undefined} onClick={()=>setListPage(number)}>{number}</button>)}<button type="button" className="button outline" disabled={activePage===pageCount} onClick={()=>setListPage(activePage+1)}>다음</button></div></nav></>:
+ mode==='list'?<><div className="admin-title"><h1>시공사례 관리</h1><div className="admin-title-actions">{production&&<a className="button outline" href="/api/gallery-backup">백업 다운로드</a>}<a className="button" href={ADMIN_PATH+'/editor'}>새 사례 등록</a></div></div><div className="management-head"><span>시공사례</span><span>공간</span><span>수정</span><span>삭제</span></div>{visibleItems.map(c=><article className="admin-case" key={c.id}><div className="case-meta"><img src={c.photos[0]} alt=""/><h2>{c.short}</h2></div><span>{c.category}</span><a href={ADMIN_PATH+'/editor?id='+c.id}>수정</a><button disabled={busy} onClick={()=>confirm('이 사례를 삭제할까요?')&&send({action:'delete',id:c.id})}>삭제</button></article>)}<nav className="gallery-pagination" aria-label="시공사례 페이지"><span className="gallery-total">총 {items.length}건</span><div><button type="button" className="button outline" disabled={activePage===1} onClick={()=>setListPage(activePage-1)}>이전</button>{Array.from({length:Math.min(5,pageCount)},(_,i)=>Math.min(Math.max(1,activePage-2),Math.max(1,pageCount-4))+i).map(number=><button type="button" key={number} className="page-number" aria-current={number===activePage?'page':undefined} onClick={()=>setListPage(number)}>{number}</button>)}<button type="button" className="button outline" disabled={activePage===pageCount} onClick={()=>setListPage(activePage+1)}>다음</button></div></nav></>:
  <><h1>{id?'시공사례 수정':'새 사례 등록'}</h1><form className="editor compact-editor" onSubmit={e=>{e.preventDefault();if(!item.photos.length){setStatus('사진을 선택해 주세요.');return}send({action:'save',item,id})}}>
  <section className="editor-panel"><label>공간<select value={item.category} onChange={e=>field('category',e.target.value)}>{['카페','매장','사무실'].map(v=><option key={v}>{v}</option>)}</select></label>
  {Object.entries({short:'제목',products:'제작 품목',desc:'본문',material:'소재',finish:'마감',condition:'현장 조건'}).map(([key,label])=><label key={key} className={key==='desc'?'field-wide':''}>{label}{key==='desc'?<textarea rows={3} maxLength={3000} value={item[key]||''} required onChange={e=>field(key,e.target.value)}/>:<input maxLength={{short:100,products:250,material:250,finish:250,condition:500}[key]} value={item[key]||''} required={['short','products'].includes(key)} onChange={e=>field(key,e.target.value)}/>}</label>)}</section>
@@ -112,6 +113,6 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
  </div>
  <div className="ai-setting"><label className="checkbox"><input type="checkbox" checked={item.ai} onChange={e=>field('ai',e.target.checked)}/><span>AI 이미지 표시</span></label>
  <p>체크하면 공개 사진에 ‘가상 사례 · AI 생성 이미지’ 안내가 표시됩니다.</p></div>
-</section><div className="editor-actions"><a href="/admin" className="button outline">취소</a><button disabled={busy} className="button">저장</button></div></form></>}
+</section><div className="editor-actions"><a href={ADMIN_PATH} className="button outline">취소</a><button disabled={busy} className="button">저장</button></div></form></>}
  <p role="status">{status}</p></main></div></>;
 }

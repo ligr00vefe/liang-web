@@ -1,3 +1,4 @@
+import {ADMIN_PATH} from '../lib/admin-path';
 import {useState} from 'react';
 
 export default function AccountSettings({email}) {
@@ -19,7 +20,7 @@ export default function AccountSettings({email}) {
     finally{setBusy(false);}
   }
   return <><div className="admin-title"><div><h1>계정 설정</h1><p className="muted">대표 관리자 이메일과 비밀번호를 직접 변경합니다.</p></div></div>
-    {done?<section className="account-panel"><h2>계정 정보를 변경했습니다.</h2><p>기존 로그인은 모두 종료됐습니다. 변경한 계정으로 다시 로그인해 주세요.</p><a className="button" href="/admin">다시 로그인</a></section>:
+    {done?<section className="account-panel"><h2>계정 정보를 변경했습니다.</h2><p>기존 로그인은 모두 종료됐습니다. 변경한 계정으로 다시 로그인해 주세요.</p><a className="button" href={ADMIN_PATH}>다시 로그인</a></section>:
     <form className="account-panel" onSubmit={submit}>
       <label>관리자 이메일<input type="email" name="email" defaultValue={email} autoComplete="username" required maxLength={254}/></label>
       <label>현재 비밀번호<input type="password" name="current" autoComplete="current-password" required maxLength={256}/></label>
