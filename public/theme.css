@@ -1,4 +1,11 @@
 :root {
+  --content-max-width: 1440px;
+  --content-gutter: 72px;
+  --content-width: min(calc(100% - 2 * var(--content-gutter)), var(--content-max-width));
+  --content-inline-offset: max(var(--content-gutter), calc((100% - var(--content-max-width)) / 2));
+  --brand-hero-size: clamp(64px, 18.5vw, 296px);
+  --brand-footer-size: clamp(56px, 12.8vw, 176px);
+
   --primary: #33281f;
   --secondary: #e6dfd5;
   --accent: #fff1da;
@@ -88,3 +95,13 @@
 body {color:var(--body)}
 h1,h2,h3 {color:var(--heading)}
 .dark,.hero,.footer,.cta {--heading:var(--paper)}.service,.services,.process,.menu-panel,.auth-visual {--heading:var(--paper)}
+
+@media(max-width:1100px) {
+  :root { --content-gutter:40px; }
+}
+@media(max-width:760px) {
+  :root {
+    --content-gutter:20px;
+    --brand-footer-size:14.4vw;
+  }
+}

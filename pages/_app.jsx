@@ -4,6 +4,7 @@ import '../public/theme.css';
 import '../styles/public-main.css';
 import '../styles/public-sub.css';
 import '../public/navigation.css';
+import '../styles/layout.css';
 
 export default function App({Component,pageProps}){
  const router=useRouter();

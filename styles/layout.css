@@ -1,0 +1,30 @@
+/* One shared container for public page content, navigation and footer. */
+.public-main .shell,
+.public-sub .shell,
+.site-header-inner {
+  width:var(--content-width);
+  max-width:var(--content-max-width);
+  margin-inline:auto;
+}
+.site-mobile-nav:not([hidden]) {
+  width:var(--content-width);
+  margin-inline:auto;
+  padding-inline:0;
+}
+.public-main .hero-wordmark {
+  font-size:var(--brand-hero-size);
+}
+.public-main .footer-wordmark,
+.public-sub .wordmark {
+  font-size:var(--brand-footer-size);
+}
+.public-main .hero-image-note {
+  right:var(--content-inline-offset);
+}
+@media(max-width:760px) {
+  .public-main .hero-image-note {
+    left:var(--content-inline-offset);
+    right:auto;
+  }
+}
+.public-main .hero-wordmark {margin-left:0}
