@@ -23,7 +23,7 @@ export async function getServerSideProps({params,res}) {
   return {props:{name,title,markup:name === 'main' ? await homeGallery(content) : content}};
 }
 export default function PublicPage({name,title,markup}) {
-  return <><Head><title>{title} | 리앙 가구</title></Head>
+  return <><Head><title>{`${title} | 리앙 가구`}</title></Head>
     <div className={name==='main'?'public-main':'public-sub'}><SiteHeader/><div key={name} dangerouslySetInnerHTML={{__html:markup}}/></div>
 
   </>;
