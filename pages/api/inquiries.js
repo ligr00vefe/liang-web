@@ -28,7 +28,8 @@ async function netlify(path,method='GET') {
     error.status=response.status;
     throw error;
   }
-  return response.status===204 ? null : response.json();
+  const text=await response.text();
+  return text?JSON.parse(text):null;
 }
 export default async function inquiries(req,res) {
   res.setHeader('Cache-Control','private, no-store');
@@ -53,6 +54,7 @@ export default async function inquiries(req,res) {
       if(!row||row.form_id!==formId) return res.status(404).json({error:'문의를 찾을 수 없습니다.'});
       const sql=retentionSql();
       if(req.method==='PATCH') {
+        if(req.body?.action==='verify'){await netlify('/submissions/'+id+'/ham','PUT');return res.json({ok:true});}
         if(!['close','reopen'].includes(req.body?.action))return res.status(400).end();
         if(req.body.action==='reopen')await sql`DELETE FROM inquiry_retention WHERE submission_id=${id}`;
         else await sql`INSERT INTO inquiry_retention(submission_id,closed_at,delete_after) VALUES (${id},now(),now()+interval '6 months') ON CONFLICT(submission_id) DO NOTHING`;

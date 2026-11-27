@@ -40,6 +40,15 @@ export default function InquiryManager() {
       setSelected({...selected,retention:body.retention});setRefresh(v=>v+1);
     }catch(error){setDeleteError(error.message);}finally{setRemoving(false);}
   }
+  async function restoreInquiry() {
+    if(!selected||removing)return;
+    setRemoving(true);setDeleteError('');
+    try {
+      const response=await fetch('/api/inquiries?id='+selected.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify'})});
+      if(!response.ok)throw new Error('접수함으로 이동하지 못했습니다. 다시 시도해 주세요.');
+      dialog.current.close();setState('verified');setPage(1);setRefresh(v=>v+1);setNotice('접수함으로 이동했습니다.');
+    }catch(error){setDeleteError(error.message);}finally{setRemoving(false);}
+  }
   async function remove() {
     if(!selected||removing) return;
     setRemoving(true);setDeleteError('');
@@ -80,6 +89,7 @@ export default function InquiryManager() {
     <dialog className="inquiry-dialog" ref={dialog} onClose={()=>{setSelected(null);setDeleteError('');}} onCancel={event=>{if(removing)event.preventDefault();}}>
       {selected&&<><div className="inquiry-detail-heading"><div><h2>제작 문의 상세</h2><p>{date(selected.createdAt)} 접수</p></div><button type="button" className="button outline" disabled={removing} onClick={()=>dialog.current.close()}>닫기</button></div>
        <dl className="inquiry-fields">{Object.entries(labels).map(([key,label])=><div key={key}><dt>{label}</dt><dd>{selected.data[key]||'미입력'}</dd></div>)}</dl>
+       {state==='spam'&&<div className="inquiry-restore"><p>정상 문의라면 접수함으로 이동해 관리할 수 있습니다.</p><button type="button" className="button outline" disabled={removing} onClick={restoreInquiry}>접수함으로 이동</button></div>}
        <section className="inquiry-retention"><p>{selected.retention?'상담 종료: '+date(selected.retention.closed_at)+' / 자동 삭제 예정: '+date(selected.retention.delete_after):'상담 진행 중 — 종료 시 아래 버튼으로 표시해 주세요.'}</p><button className="button outline" disabled={removing} onClick={updateRetention}>{selected.retention?'상담 다시 열기':'상담 종료 처리'}</button><p className="muted">6개월 경과 후 정기 작업에서 문의 원문과 종료 기록을 삭제합니다. 메일함·다운로드 사본은 포함되지 않습니다.</p></section>
        <form onSubmit={event=>{event.preventDefault();remove();}} className="inquiry-delete">
         <label className="checkbox"><input key={selected.id} type="checkbox" required disabled={removing}/><span>이 문의를 영구 삭제하는 데 동의합니다.</span></label>
