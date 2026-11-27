@@ -28,7 +28,6 @@ export default function PrivacyModal(){
    <div className="privacy-consent-note"><h3>동의를 거부할 권리 및 안내</h3><p>개인정보 수집·이용에 동의하지 않을 수 있습니다. 다만 필수 정보에 동의하지 않으면 온라인 문의 접수가 제한됩니다. 선택 항목은 입력하지 않아도 문의할 수 있습니다.</p></div>
    <details className="privacy-details"><summary>개인정보 처리 상세 안내</summary><div>
     <h3>문의 정보의 관리 및 삭제</h3><p>상담 종료일을 기준으로 6개월이 지난 문의는 정기 작업으로 삭제합니다. 이메일 알림과 다운로드 파일 등 별도 사본도 운영자가 같은 보유 기준에 따라 삭제합니다.</p>
-    <h3>개인정보 처리 업무의 위탁</h3><table className="privacy-summary"><caption className="sr-only">개인정보 처리 수탁자와 업무</caption><tbody><tr><th scope="row">Netlify</th><td>문의 접수·보관 및 알림 연동</td></tr><tr><th scope="row">Neon</th><td>문의 보유기간 관리 기록 보관</td></tr></tbody></table>
    </div></details>
   </div><div className="privacy-dialog-footer"><button type="button" className="button" onClick={()=>dialog.current.close()}>내용 확인</button></div>
  </dialog>;
