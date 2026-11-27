@@ -3,7 +3,7 @@ import path from 'node:path';
 import Head from 'next/head';
 import SiteHeader from '../components/SiteHeader';
 import {homeGallery} from '../lib/home-gallery';
-import {prepareContent,privacyPause,inquiryEnabled} from '../lib/public-content';
+import {prepareContent} from '../lib/public-content';
 
 const pages = {
   '': ['main','서울·경기 맞춤가구 제작·설치'],
@@ -17,10 +17,11 @@ const pages = {
 export async function getServerSideProps({params,res}) {
   const route=(params.route || []).join('/');
   if (!Object.hasOwn(pages,route)) return {notFound:true};
+  if(route==='privacy')return {redirect:{destination:'/inquiry?privacy=1',permanent:false}};
   const [name,title]=pages[route];
   if(route && !['inquiry','privacy'].includes(route) && !route.startsWith('works'))res.setHeader('Cache-Control','public, s-maxage=3600, stale-while-revalidate=86400');
   const markup=fs.readFileSync(path.join(process.cwd(),'content',name+'.html'),'utf8');
-  const content=prepareContent(route==='privacy'&&!inquiryEnabled?privacyPause(markup):markup);
+  const content=prepareContent(markup);
   return {props:{name,title,markup:name === 'main' ? await homeGallery(content) : content}};
 }
 export default function PublicPage({name,title,markup}) {

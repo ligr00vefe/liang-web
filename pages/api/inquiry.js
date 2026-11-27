@@ -2,7 +2,7 @@ import settings from '../../content/site-settings.json';
 import {mkdir,appendFile} from 'node:fs/promises';
 export default async function inquiry(req,res) {
   if(process.env.NODE_ENV !== 'development') return res.status(404).end();
-  if(!settings.inquiryEnabled||!settings.privacyApproved)return res.status(503).json({error:'inquiries-paused'});
+  if(!settings.inquiryEnabled)return res.status(503).json({error:'inquiries-paused'});
   if(req.method !== 'POST') return res.status(405).end();
   const fields=['name','phone','area','schedule','size','message'];
   const data=Object.fromEntries(fields.map(key=>[key,String(req.body[key]||'').trim()]));

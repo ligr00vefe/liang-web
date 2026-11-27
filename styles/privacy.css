@@ -1,0 +1,18 @@
+.consent-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.privacy-content-button,.privacy-footer-button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:4px}
+.privacy-content-button{white-space:nowrap;font-size:14px}
+.privacy-dialog{padding:0;width:min(640px,calc(100% - 32px));max-height:calc(100dvh - 40px);margin:auto;border:1px solid var(--line);background:var(--paper);color:var(--body);box-shadow:0 18px 80px #0003;font:15px/1.8 var(--font-body);box-sizing:border-box}
+.privacy-dialog[open]{display:flex;flex-direction:column}
+.privacy-dialog::backdrop{background:#10110fa8}
+.privacy-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 28px;border-bottom:1px solid var(--line);flex-shrink:0}
+.privacy-dialog-header p{margin:0 0 4px;font-size:12px;color:var(--muted)}
+.privacy-dialog-header h2{margin:0;font-size:24px;line-height:1.4;color:var(--heading)}
+.privacy-dialog-header button{width:44px;height:44px;flex-shrink:0;border:1px solid var(--line);background:transparent;color:var(--heading);font:28px/1 sans-serif;cursor:pointer}
+.privacy-dialog-content{padding:24px 28px;overflow:auto;overscroll-behavior:contain;min-height:0}
+.privacy-dialog-content p{margin:0}.privacy-dialog-content dl{margin:20px 0 0}
+.privacy-dialog-content dl>div{padding:16px 0;border-top:1px solid var(--line)}
+.privacy-dialog-content dt{font-weight:600;margin-bottom:6px;color:var(--heading)}.privacy-dialog-content dd{margin:0}
+.privacy-dialog-content dd p{margin-top:8px}.privacy-dialog-content strong{font-size:18px;color:var(--primary)}
+.privacy-dialog-footer{padding:16px 28px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;flex-shrink:0}
+.privacy-dialog-footer .button{padding:10px 28px;background:var(--primary);color:var(--accent);border:0;font:inherit;cursor:pointer}
+@media(max-width:480px){.privacy-dialog-header,.privacy-dialog-content{padding:20px}.privacy-dialog-header h2{font-size:20px}.privacy-dialog-footer{padding:14px 20px}.privacy-dialog-footer .button{width:100%}}

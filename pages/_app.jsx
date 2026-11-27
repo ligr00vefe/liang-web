@@ -1,3 +1,5 @@
+import PrivacyModal from '../components/PrivacyModal';
+import '../styles/privacy.css';
 import {useEffect,useState} from 'react';
 import {useRouter} from 'next/router';
 import '../public/theme.css';
@@ -47,5 +49,5 @@ export default function App({Component,pageProps}){
   form?.addEventListener('submit',submit);
   return()=>form?.removeEventListener('submit',submit);
  },[router.asPath]);
- return <><Component {...pageProps}/>{navigating&&<div className="navigation-feedback" role="status"><div className="navigation-progress"/><span>페이지를 불러오고 있습니다.</span></div>}</>;
+ return <><Component {...pageProps}/><PrivacyModal/>{navigating&&<div className="navigation-feedback" role="status"><div className="navigation-progress"/><span>페이지를 불러오고 있습니다.</span></div>}</>;
 }

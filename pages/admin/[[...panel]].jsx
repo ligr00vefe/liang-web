@@ -1,3 +1,4 @@
+import BrandLogo from '../../components/BrandLogo';
 import Head from 'next/head';
 import InquiryManager from '../../components/InquiryManager';
 import AccountSettings from '../../components/AccountSettings';
@@ -72,7 +73,7 @@ export default function Admin({mode,ready,items,id,token,loginAvailable=true,pro
   } catch {setStatus('사진을 변환하지 못했습니다. 다른 사진을 선택해 주세요.');}
  }
  const auth=mode==='login'||mode==='setup';
- return <><Head><title>리앙 가구 관리자</title><meta name="robots" content="noindex"/><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/><link rel="stylesheet" href="/admin.css"/></Head><header className="admin-header"><a className="logo" href="/"><img src="/assets/logo_liang_dark.svg" alt="리앙 가구"/></a><span>관리자</span><a href="/works">공개 갤러리 보기</a></header>
+ return <><Head><title>리앙 가구 관리자</title><meta name="robots" content="noindex"/><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/><link rel="stylesheet" href="/admin.css"/></Head><header className="admin-header"><BrandLogo/><span>관리자</span><a href="/works">공개 갤러리 보기</a></header>
  <div className={auth?'':'admin-console'}>
  {!auth&&<aside className="console-sidebar"><div><p className="eyebrow">리앙 가구 관리</p><nav aria-label="관리자 메뉴"><a href="/admin" aria-current={['list','editor'].includes(mode)?'page':undefined}>시공사례 관리</a><a href="/admin/inquiries" aria-current={mode==='inquiries'?'page':undefined}>제작 문의 관리</a>{production&&<a href="/admin/account" aria-current={mode==='account'?'page':undefined}>계정 설정</a>}</nav></div><div className="console-account"><p>대표 관리자</p><button className="button outline" disabled={busy} onClick={()=>send({action:'logout'})}>로그아웃</button></div></aside>}
  <main className={auth?"shell section":"shell admin-workspace"} style={{maxWidth:auth?460:1200}}>

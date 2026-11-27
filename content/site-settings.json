@@ -1,7 +1,6 @@
 {
   "officialUrl": "https://liangfurniture.netlify.app",
-  "inquiryEnabled": false,
-  "privacyApproved": false,
+  "inquiryEnabled": true,
   "phone": null,
   "kakaoUrl": null,
   "operator": "리앙 가구",
