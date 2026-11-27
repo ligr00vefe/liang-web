@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import Head from 'next/head';
+import SiteHeader from '../../components/SiteHeader';
 import {readGallery} from '../../lib/gallery';
 
 export async function getServerSideProps({params}){
@@ -16,7 +17,7 @@ function Photo({item,src,styleName=''}){
 export default function Gallery({items,id,header,footer}){
  const item=items[0];
  const title=id?item.short:'공간마다, 다른 쓰임.';
- return <><Head><title>{title} | 리앙 가구</title><link rel="stylesheet" href="/theme.css"/><link rel="stylesheet" href="/sub.css"/></Head><div dangerouslySetInnerHTML={{__html:header}}/>
+ return <><Head><title>{title} | 리앙 가구</title></Head><div className="public-sub"><SiteHeader/>
  <main><section className="shell intro"><p className="eyebrow">{id?item.category+' 맞춤가구':'제작 갤러리'}</p><h1>{id?title:<>공간마다,<br/>다른 쓰임.</>}</h1><p className="intro-desc">{id?item.products:'가구가 놓일 자리부터 작은 디테일까지. 공간에 맞춘 제작 방향을 살펴보세요.'}</p></section>
- {id?<><Photo item={item} src={item.photos[0]} styleName="shell detail-hero"/><section className="shell split section"><div><h2>{item.short}</h2><p className="body-copy">{item.desc}</p></div><dl className="specs">{Object.entries({products:'제작 품목',material:item.ai?'소재 예시':'소재',finish:'마감 방향',condition:'현장 확인 항목'}).filter(([key])=>item[key]).map(([key,label])=><div key={key}><dt>{label}</dt><dd>{item[key]}</dd></div>)}</dl></section>{item.photos.slice(1).map((src,i)=><Photo key={i} item={item} src={src} styleName="shell secondary-image"/>)}<div className="shell detail-actions"><a href="/works">갤러리 목록</a><a href="/inquiry" className="button">제작 문의하기</a></div></>:<section className="shell work-grid">{items.length===0&&<p>등록된 사례가 없습니다.</p>}{items.map(c=><a className="case-card" key={c.id} href={'/works/'+c.id}><Photo item={c} src={c.photos[0]}/><div className="case-heading"><h2>{c.short}</h2><span className="tag">{c.category}</span></div><p>{c.products}</p></a>)}</section>}</main><div dangerouslySetInnerHTML={{__html:footer}}/><script defer src="/public.js"/></>;
+ {id?<><Photo item={item} src={item.photos[0]} styleName="shell detail-hero"/><section className="shell split section"><div><h2>{item.short}</h2><p className="body-copy">{item.desc}</p></div><dl className="specs">{Object.entries({products:'제작 품목',material:item.ai?'소재 예시':'소재',finish:'마감 방향',condition:'현장 확인 항목'}).filter(([key])=>item[key]).map(([key,label])=><div key={key}><dt>{label}</dt><dd>{item[key]}</dd></div>)}</dl></section>{item.photos.slice(1).map((src,i)=><Photo key={i} item={item} src={src} styleName="shell secondary-image"/>)}<div className="shell detail-actions"><a href="/works">갤러리 목록</a><a href="/inquiry" className="button">제작 문의하기</a></div></>:<section className="shell work-grid">{items.length===0&&<p>등록된 사례가 없습니다.</p>}{items.map(c=><a className="case-card" key={c.id} href={'/works/'+c.id}><Photo item={c} src={c.photos[0]}/><div className="case-heading"><h2>{c.short}</h2><span className="tag">{c.category}</span></div><p>{c.products}</p></a>)}</section>}</main><div dangerouslySetInnerHTML={{__html:footer}}/></div></>;
 }

@@ -1,0 +1,30 @@
+.site-header{position:sticky;top:0;z-index:50;background:#f1f1ef;background:var(--paper,#f1f1ef);color:var(--heading,#131411);border-bottom:1px solid var(--line,#d7d8d3)}
+.site-header-inner{width:calc(100% - 80px);max-width:1440px;margin:auto;height:88px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.site-brand img{display:block;width:76px;height:62px;object-fit:contain}
+.site-desktop-nav{display:flex;align-items:center;gap:32px;font-size:14px}
+.site-desktop-nav a{padding:10px 0;color:inherit}
+.site-desktop-nav a[aria-current]{border-bottom:1px solid currentColor}
+.site-desktop-nav a:last-child{background:var(--primary,#33281f);color:var(--accent,#fff1da);padding:10px 22px}
+.site-menu-toggle{display:none}
+.site-mobile-nav{display:none}
+.navigation-feedback{position:fixed;z-index:100;top:0;left:0;right:0;pointer-events:none}
+.navigation-progress{height:3px;background:#a57c45;width:65%;animation:navigationPulse 1s ease-in-out infinite alternate}
+.navigation-feedback>span{position:absolute;right:18px;top:105px;padding:9px 15px;background:#33281f;color:#fff1da;font:14px/1.6 'Malgun Gothic',sans-serif;box-shadow:0 2px 12px #0002}
+@keyframes navigationPulse{from{width:25%}to{width:85%}}
+.reveal{opacity:1!important;transform:none!important}
+@media(max-width:760px){
+ .site-header-inner{width:calc(100% - 40px);height:76px}
+ .site-brand img{width:64px;height:55px}
+ .site-desktop-nav{display:none}
+ .site-menu-toggle{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px;font-size:14px;color:inherit;background:transparent;border:0}
+ .site-menu-toggle span{font-size:23px}
+ .site-mobile-nav:not([hidden]){display:grid;gap:0;padding:4px 20px 20px;border-top:1px solid var(--line,#d7d8d3);background:var(--paper,#f1f1ef);color:var(--heading,#131411)}
+ .site-mobile-nav a{display:block;padding:15px 8px;border-bottom:1px solid var(--line,#d7d8d3);font-size:17px}
+ .navigation-feedback>span{top:88px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.navigation-progress{animation:none}}
+
+body{margin:0}
+.site-header{font-family:var(--font-body,'Malgun Gothic',sans-serif)}
+.public-main,.public-sub{min-height:100vh}
+.site-header a:focus-visible,.site-menu-toggle:focus-visible{outline:2px solid var(--primary,#33281f);outline-offset:4px}
